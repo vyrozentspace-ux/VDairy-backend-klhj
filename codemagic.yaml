@@ -7,18 +7,24 @@ workflows:
       node: 18
     scripts:
       - name: Install dependencies
-        script: npm install
+        script: |
+          cd vdairy
+          npm install
       - name: Build web app
-        script: npm run build
+        script: |
+          cd vdairy
+          npm run build
       - name: Sync Capacitor
-        script: npx cap sync android
+        script: |
+          cd vdairy
+          npx cap sync android
       - name: Build APK
         script: |
-          cd android
+          cd vdairy/android
           chmod +x gradlew
           ./gradlew assembleRelease
     artifacts:
-      - android/app/build/outputs/apk/release/app-release-unsigned.apk
+      - vdairy/android/app/build/outputs/apk/release/app-release-unsigned.apk
     publishing:
       email:
         recipients:
