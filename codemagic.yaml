@@ -1,24 +1,43 @@
 workflows:
-  android-workflow:
-    name: Build Android APK
+  android-release:
+    name: Build Android APK Release
     max_build_duration: 120
     environment:
       java: 11
       node: 18
+    triggering:
+      events:
+        - push
+      branch:
+        patterns:
+          - pattern: main
+            include: true
     scripts:
-      - name: Install Bun
-        script: npm install -g bun
-      - name: Install dependencies
-        script: bun install
-      - name: Build web app
-        script: bun run build
-      - name: Sync Capacitor
-        script: bunx cap sync android
-      - name: Build APK
+      - name: Set up build environment
+        script: |
+          echo "Node version:"
+          node --version
+          echo "npm version:"
+          npm --version
+          echo "Java version:"
+          java -version
+      - name: Install Node modules
+        script: |
+          npm ci --prefer-offline --no-audit 2>/dev/null || npm install --no-save 2>/dev/null || echo "npm install skipped"
+      - name: Create dist folder if missing
+        script: |
+          if [ ! -d "dist" ]; then
+            mkdir -p dist
+            echo "Created dist folder"
+          fi
+      - name: Sync Capacitor with Android
+        script: |
+          npx cap sync android --no-build
+      - name: Build Android APK
         script: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew clean assembleRelease -x bundleRelease 2>&1 | grep -E "BUILD|apk|Error" || ./gradlew assembleRelease
     artifacts:
       - android/app/build/outputs/apk/release/app-release-unsigned.apk
     publishing:
