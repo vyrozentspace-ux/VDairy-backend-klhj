@@ -5,7 +5,6 @@ workflows:
     environment:
       java: 11
       node: 18
-      ndk: 23.1.8779455
     scripts:
       - name: Install dependencies
         script: npm install
