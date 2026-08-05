@@ -6,12 +6,14 @@ workflows:
       java: 11
       node: 18
     scripts:
+      - name: Install Bun
+        script: npm install -g bun
       - name: Install dependencies
-        script: npm install
+        script: bun install
       - name: Build web app
-        script: npm run build
+        script: bun run build
       - name: Sync Capacitor
-        script: npx cap sync android
+        script: bunx cap sync android
       - name: Build APK
         script: |
           cd android
